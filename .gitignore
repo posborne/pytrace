@@ -1,7 +1,18 @@
+# setuptools directory
 build
+
+# python object files
 *.pyc
+*.pyo
+
+# sqlite
 db.sqlite
+
+# Editor files
 \#*\#
+*~
+
+# miscellaneous
 .\#*
 *.gch
 *.dSYM
