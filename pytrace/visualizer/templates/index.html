@@ -1,0 +1,28 @@
+<html>
+  <head>
+<title>pytrace visualizer</title>
+</head>
+<body>
+<h1>pytrace visualizer</h1>
+
+{% for tid, traces in data_by_tid|dictsort %}
+<h2>TID: {{ tid }}</h2>
+<table>
+<thead>
+  <tr>
+    <th>func</th>
+    <th>time</th>
+  </tr>
+</thead>
+<tbody>
+{% for trace in traces %}
+  <tr>
+    <td>{{ trace.func.name }}</td>
+    <td>{{ trace.time }}s</td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endfor %}
+</body>
+</html>
