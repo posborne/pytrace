@@ -22,7 +22,7 @@
     <td>{{ fid }}</td>
     <td>{{ finfo.func.name }}</td>
     <td>{{ finfo.call_count }}</td>
-    <td>{{ finfo.tottime }}</td>
+    <td>{{ finfo.tottime|float|round(3) }}</td>
   </tr>
 {% endfor %}
 </tbody>

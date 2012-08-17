@@ -31,13 +31,12 @@ def by_thread_function():
             if trace.type == "call":
                 call_times.setdefault(trace.func_id, {})[trace.depth] = trace.time
                 funcdata['call_count'] += 1
-            elif trace.type == "return":
+            elif trace.type == "return" or trace.type == "exception":
                 start_time = call_times.setdefault(trace.func_id, {}).setdefault(trace.depth, trace.time)
                 timedelta = trace.time - start_time
                 del call_times[trace.func_id][trace.depth]
                 funcdata['tottime'] += timedelta
 
-    pprint.pprint(funcstats_by_tid)
     return flask.render_template("index.html", funcstats_by_tid=funcstats_by_tid)
 
 
