@@ -3,21 +3,42 @@ from pytrace.reader.tables import Trace, Arg, ArgName, ArgValue, Type, Module, F
 import os
 import sys
 import flask
+import pprint
 
 app = flask.Flask(__name__)
 db = None
 
 @app.route("/")
-def index():
-    return "Hello, world!"
-
-
-@app.route("/bythread")
-def bythread():
-    data_by_tid= {}
+def by_thread_function():
+    traces_by_tid= {}
     for tid in db.session.query(Trace.tid).distinct():
-        data_by_tid[tid[0]] = db.session.query(Trace).filter(Trace.tid == tid[0])
-    return flask.render_template("index.html", data_by_tid=data_by_tid)
+        traces_by_tid[tid[0]] = (db.session.query(Trace)
+                                 .filter(Trace.tid == tid[0])
+                                 .order_by(Trace.id))  # call order?
+
+    funcstats_by_tid = {}
+    for tid, traces in traces_by_tid.iteritems():
+        funcs = {}
+        funcstats_by_tid[tid] = {'traces': traces,
+                                 'funcs': funcs, }
+        call_times = {}  # depth -> call_time
+        for trace in traces:
+            if trace.func_id not in funcs:
+                funcs[trace.func_id] = {'func': trace.func,
+                                        'call_count': 0,
+                                        'tottime': 0, }
+            funcdata = funcs[trace.func_id]
+            if trace.type == "call":
+                call_times.setdefault(trace.func_id, {})[trace.depth] = trace.time
+                funcdata['call_count'] += 1
+            elif trace.type == "return":
+                start_time = call_times.setdefault(trace.func_id, {}).setdefault(trace.depth, trace.time)
+                timedelta = trace.time - start_time
+                del call_times[trace.func_id][trace.depth]
+                funcdata['tottime'] += timedelta
+
+    pprint.pprint(funcstats_by_tid)
+    return flask.render_template("index.html", funcstats_by_tid=funcstats_by_tid)
 
 
 if __name__ == '__main__':

@@ -5,20 +5,24 @@
 <body>
 <h1>pytrace visualizer</h1>
 
-{% for tid, traces in data_by_tid|dictsort %}
+{% for tid, funcstats in funcstats_by_tid|dictsort %}
 <h2>TID: {{ tid }}</h2>
-<table>
+<table border="1">
 <thead>
   <tr>
+    <th>id</td>
     <th>func</th>
-    <th>time</th>
+    <th>call_count</th>
+    <th>tottime</th>
   </tr>
 </thead>
 <tbody>
-{% for trace in traces %}
+{% for fid, finfo in funcstats.funcs|dictsort %}
   <tr>
-    <td>{{ trace.func.name }}</td>
-    <td>{{ trace.time }}s</td>
+    <td>{{ fid }}</td>
+    <td>{{ finfo.func.name }}</td>
+    <td>{{ finfo.call_count }}</td>
+    <td>{{ finfo.tottime }}</td>
   </tr>
 {% endfor %}
 </tbody>
